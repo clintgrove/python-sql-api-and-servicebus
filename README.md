@@ -63,7 +63,8 @@ Change all the variables and parameters to match the names of your Azure Resourc
 
 `uvicorn app:app --reload`
 
-![Power BI table representation](./localVScode.png)
+![architecture](https://github.com/user-attachments/assets/ede76ed0-e601-45ce-91dc-120b8a92d1fd)
+
 
 This will give you http://127.0.0.1:8000, click on this and your web app will spin up locally on a browser tab. 
 
