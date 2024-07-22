@@ -15,7 +15,7 @@ There are few different steps that I did as I followed along on the tutorial lin
 
 This is a rough diagram of what I built. But note that I did not code for the sending of messages after I completed writing to the SQL database (blue and yellow part of diagram). 
 
-![a picture of what I built](./architecture.png)
+![architecture](https://github.com/user-attachments/assets/ede76ed0-e601-45ce-91dc-120b8a92d1fd)
 ## Steps 
 ### Set up a Python environment (locally)
 
@@ -63,8 +63,7 @@ Change all the variables and parameters to match the names of your Azure Resourc
 
 `uvicorn app:app --reload`
 
-![architecture](https://github.com/user-attachments/assets/ede76ed0-e601-45ce-91dc-120b8a92d1fd)
-
+![localVScode](https://github.com/user-attachments/assets/9a7b6315-f599-4fec-b801-abde0ab5d16b)
 
 This will give you http://127.0.0.1:8000, click on this and your web app will spin up locally on a browser tab. 
 
