@@ -105,7 +105,7 @@ def process_messages_from_servicebus_to_sql():
         if records_to_insert:
             try:
                 # Use the get_database_connection function to establish a connection
-                print(f"Starting the insert process to SQL table.")
+                logtel = print(f"Starting the insert process to SQL table.")
                 connection = get_database_connection()
                 if connection is None:
                     raise Exception("Failed to connect to the database.")
@@ -126,7 +126,7 @@ def process_messages_from_servicebus_to_sql():
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
-    #return item
+    return rows_affected
 
 
 def get_database_connection():

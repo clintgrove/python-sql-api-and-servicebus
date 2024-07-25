@@ -29,7 +29,7 @@ async def send_messages(start_id: int, end_id: int):
                     print(f"Failed to send message {i}: {e}")
 
 async def main():
-    total_messages = 5000
+    total_messages = 50
     processors = 10
     messages_per_processor = total_messages // processors
 

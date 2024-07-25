@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\clintgrove\python-sql-and-servicebus\.venv"
+VIRTUAL_ENV="C:\Users\clintgrove\GitHubRepos\python-sql-api-and-servicebus\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
