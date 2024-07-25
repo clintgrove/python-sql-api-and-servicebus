@@ -54,6 +54,13 @@ Establish the variable in your python environment by running this in the termina
 ```c
 $env:AZURE_SQL_CONNECTIONSTRING="Driver={ODBC Driver 18 for SQL Server};Server=tcp:<sqlservername>.database.windows.net,1433;Database=<databasename>;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30"
 ```
+UPDATE (25th July 2024)
+
+I changed the code slightly to use Managed identity to connect to Service bus so now you have to add this as a Environment variable in the Azure Web App and in your local environment
+```
+$env:AZURE_SUBSCRIPTION_ID="3be2ce56-4a5f-4034-88d7-2953dxxxxxx"    
+```
+
 ### Create the app code that builds the API and has the write to SQL logic
 I wont get into all the code as it is quite long, you can check out my GitHub page here for the full example. 
 
