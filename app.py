@@ -9,6 +9,8 @@ from pydantic import BaseModel
 from typing import Union
 from azure.core.exceptions import AzureError
 import logging
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.servicebus import ServiceBusManagementClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +25,7 @@ constants = {
 }
 
 connection_string = os.environ["AZURE_SQL_CONNECTIONSTRING"]
+azure_subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
 
 class Person(BaseModel):
     PersonID: str
@@ -69,11 +72,8 @@ def process_messages_from_servicebus_to_sql():
     rows_affected = 0
     
     try:
-        # Retrieve the Service Bus connection string using Azure CLI
-        command = f"az servicebus namespace authorization-rule keys list --resource-group {constants['SBUS_RESOURCE_GROUP']} --namespace-name {constants['SBUS_NAMESPACE']} --name RootManageSharedAccessKey --query primaryConnectionString --output tsv"
-        SERVICEBUS_CONN_STR = subprocess.check_output(command, shell=True).decode().strip()
-
-        # Create ServiceBusClient instance
+        SERVICEBUS_CONN_STR = get_servicebus_connection_string()
+        
         servicebus_client = ServiceBusClient.from_connection_string(
             conn_str=SERVICEBUS_CONN_STR,
             logging_enable=True
@@ -126,14 +126,6 @@ def process_messages_from_servicebus_to_sql():
                 logger.error(f"An error occurred during batch insertion: {e}")
                 raise HTTPException(status_code=500, detail=f"An error occurred during batch insertion: {e}")
 
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Failed to retrieve Service Bus connection string: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve Service Bus connection string: {e}")
-
-    except AzureError as servicebus_client_error:
-        logger.error(f"Failed to connect to Azure Service Bus: {servicebus_client_error}")
-        raise HTTPException(status_code=500, detail=f"Failed to connect to Azure Service Bus: {servicebus_client_error}")
-
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
@@ -153,3 +145,20 @@ def get_database_connection():
     except Exception as e:
         logger.error(f"Failed to connect to the database: {e}")
         raise
+
+def get_servicebus_connection_string():
+    try:
+        credential = DefaultAzureCredential()
+        client = ServiceBusManagementClient(credential, subscription_id=azure_subscription_id)
+        keys = client.namespaces.list_keys(
+            resource_group_name=constants['SBUS_RESOURCE_GROUP'],
+            namespace_name=constants['SBUS_NAMESPACE'],
+            authorization_rule_name='RootManageSharedAccessKey'
+        )
+        return keys.primary_connection_string
+    except Exception as e:
+        logger.error(f"Failed to retrieve Service Bus connection string: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve Service Bus connection string: {e}")
+
+
+

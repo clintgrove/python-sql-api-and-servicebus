@@ -4,3 +4,5 @@ uvicorn[standard]
 pydantic
 azure-identity
 azure-servicebus
+azure-core-exceptions
+azure-mgmt-servicebus
