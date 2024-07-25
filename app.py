@@ -1,13 +1,11 @@
 import json
 import os
-import subprocess
 from azure.servicebus import ServiceBusClient
 from azure import identity
 import pyodbc, struct
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Union
-from azure.core.exceptions import AzureError
 import logging
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.servicebus import ServiceBusManagementClient
