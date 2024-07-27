@@ -5,3 +5,4 @@ pydantic
 azure-identity
 azure-servicebus
 azure-mgmt-servicebus
+tenacity

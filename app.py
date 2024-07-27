@@ -9,6 +9,7 @@ from typing import Union
 import logging
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.servicebus import ServiceBusManagementClient
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -109,21 +110,17 @@ def process_messages_from_servicebus_to_sql():
             try:
                 logger.info("Starting the insert process to SQL table.")
                 connection = get_database_connection()
-                if connection is None:
-                    raise Exception("Failed to connect to the database.")
                 cursor = connection.cursor()
                 cursor.executemany(sql_command_text, records_to_insert)
                 connection.commit()
-
                 rows_affected = cursor.rowcount
                 logger.info(f"{rows_affected} rows were inserted.")
-
-                cursor.close()
-                connection.close()
             except Exception as e:
                 logger.error(f"An error occurred during batch insertion: {e}")
                 raise HTTPException(status_code=500, detail=f"An error occurred during batch insertion: {e}")
-
+            finally:
+                cursor.close()
+                connection.close()
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
@@ -131,6 +128,7 @@ def process_messages_from_servicebus_to_sql():
     return {"rows_affected": rows_affected}
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def get_database_connection():
     try:
         credential = identity.DefaultAzureCredential(exclude_interactive_browser_credential=False)
@@ -140,9 +138,9 @@ def get_database_connection():
         
         conn = pyodbc.connect(connection_string, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
         return conn
-    except Exception as e:
+    except pyodbc.Error as e:
         logger.error(f"Failed to connect to the database: {e}")
-        raise
+        raise HTTPException(status_code=500, detail="Database connection failed.")
 
 def get_servicebus_connection_string():
     try:
