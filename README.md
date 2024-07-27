@@ -15,7 +15,7 @@ There are few different steps that I did as I followed along on the tutorial lin
 
 This is a rough diagram of what I built. But note that I did not code for the sending of messages after I completed writing to the SQL database (blue and yellow part of diagram). 
 
-![architecture](https://github.com/user-attachments/assets/ede76ed0-e601-45ce-91dc-120b8a92d1fd)
+![a picture of what I built](./architecture.png)
 ## Steps 
 ### Set up a Python environment (locally)
 
@@ -54,13 +54,6 @@ Establish the variable in your python environment by running this in the termina
 ```c
 $env:AZURE_SQL_CONNECTIONSTRING="Driver={ODBC Driver 18 for SQL Server};Server=tcp:<sqlservername>.database.windows.net,1433;Database=<databasename>;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30"
 ```
-UPDATE (25th July 2024)
-
-I changed the code slightly to use Managed identity to connect to Service bus so now you have to add this as a Environment variable in the Azure Web App and in your local environment
-```
-$env:AZURE_SUBSCRIPTION_ID="3be2ce56-4a5f-4034-88d7-2953dxxxxxx"    
-```
-
 ### Create the app code that builds the API and has the write to SQL logic
 I wont get into all the code as it is quite long, you can check out my GitHub page here for the full example. 
 
@@ -70,7 +63,7 @@ Change all the variables and parameters to match the names of your Azure Resourc
 
 `uvicorn app:app --reload`
 
-![localVScode](https://github.com/user-attachments/assets/9a7b6315-f599-4fec-b801-abde0ab5d16b)
+![Power BI table representation](./localVScode.png)
 
 This will give you http://127.0.0.1:8000, click on this and your web app will spin up locally on a browser tab. 
 
@@ -87,5 +80,17 @@ The swagger API will have a list of the GET's and POST's. You can click on the "
 Until now you would have been working locally (on your laptop or desktop and using the localhost). To get the Web App deployed to Azure so that you are not just working locally, follow the steps in the URL I linked at the top of this article.
 
 Make sure to set it all up as instructed and you can see how you can connect to a SQL database using passwordless technology. Really cool. 
+
+## EXTRA: Adding SQL Failover - how to set it up
+
+Create a failover group for your SQL Server
+
+Set your environment variable "AZURE_SQL_CONNECTIONSTRING" string to point to the read/write listener endpoint for the failover group
+
+Add your users to the secondary server (yourself plus the Azure Web app). Note, I found that the Azure Web App was already a user. I just added myself as Azure Admin on the Secondary server and then tried the web app locally and it worked
+
+Force a failover on your SQL server and try execute the API to add a user to the database table.
+
+If you do a SELECT statement from either of the SQL server databases (the database that has the PeopleTable on it, this should be the database that you chose to select as part of your failover strategy) you will find that any entry into the table is also replicated to your secondary failover server and database! 
 
 Thanks for reading! Clint
